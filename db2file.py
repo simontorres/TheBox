@@ -43,6 +43,7 @@ class MainApp:
         self.access_file_name = 'mysqlaccess'
         self.thebox_env_dir = os.path.expanduser('~/') + '.thebox/'
         self.access = self.define_environment()
+        self.my_connection = connection.MySQLConnection()
 
     def define_environment(self):
         """Performs System checks and performs necessary actions
