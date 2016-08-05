@@ -2,6 +2,7 @@
 """Tool to DUMP TheBox MySQL Database to an ASCII File
 
 This script access the MySQL Database and retrieve the data
+For backwards compatibility the old mysql-python is used instead of the latest MySQLdb
 
 Note:
     This script complies with PEP8 and PEP257 (Google Style)
@@ -19,11 +20,8 @@ import base64
 import cPickle
 # import mysql.connector
 # from mysql.connector import (connection)
+# import MySQLdb.connections as connection
 # from mysql.connector import errorcode
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import matplotlib.gridspec as gridspec
-# import matplotlib.patches as mpatches
 # import socket
 # import pandas as pd
 import logging as log
@@ -95,14 +93,13 @@ class MainApp:
                             default='theBoxData',
                             dest='my_database',
                             help='MySQL Database Name.')
+
+        parser.add_argument('T', '--table-name',
+                            action='store',
+                            default='temperatureAndStatusPhaseTwo',
+                            dest='table',
+                            help='MySQL Table Name')
         """
-
-        parser.add_argument('--skip-bias',
-                            action='store_false',
-                            default=True,
-                            dest='bias',
-                            help='Skip bias correction. Helpful when you want to repeat later processes')
-
         parser.add_argument('--skip-linearity',
                             action='store_false',
                             default=True,
@@ -134,7 +131,7 @@ class MainApp:
                 log.debug("Access file exists %s", self.thebox_env_dir + self.access_file_name)
                 i_file = open(self.thebox_env_dir + self.access_file_name, 'rb')
                 access_data = cPickle.load(i_file)
-                print(access_data)
+                # print(access_data)
             else:
                 log.debug("access File doesnt exist")
                 access_data = self.access_info_request()
@@ -147,7 +144,6 @@ class MainApp:
             except OSError as error:
                 log.debug(error)
                 sys.exit(0)
-
         return access_data
 
     def access_info_request(self):
@@ -168,7 +164,6 @@ class MainApp:
         o_file = open(my_file_name, 'wb')
         cPickle.dump(access_data, o_file, protocol=cPickle.HIGHEST_PROTOCOL)
         o_file.close()
-        print access_data
         return access_data
 
 
