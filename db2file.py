@@ -17,11 +17,11 @@ import sys
 import argparse
 import getpass
 import base64
-import cPickle
-# import mysql.connector
-# from mysql.connector import (connection)
+import pickle
+import mysql.connector
+from mysql.connector import (connection)
 # import MySQLdb.connections as connection
-# from mysql.connector import errorcode
+from mysql.connector import errorcode
 # import socket
 # import pandas as pd
 import logging as log
@@ -47,7 +47,11 @@ class MainApp:
         self.access_file_name = self.args.my_file
         self.thebox_env_dir = os.path.expanduser('~/') + self.args.thebox_dir
         self.access = self.define_environment()
-        # self.my_connection = connection.MySQLConnection()
+        self.my_connection = self.connect_mysql()
+        self.cursor = self.my_connection.cursor()
+        # self.query_constraints = self.get_constraints()
+        # self.data = self.mysql_query()
+        # self.write_to_file()
 
     @staticmethod
     def get_args():
@@ -68,6 +72,12 @@ class MainApp:
                             type=str,
                             dest='my_file',
                             help='Name of the file that stores access information.')
+
+        parser.add_argument('--update-password',
+                            action='store_true',
+                            default=False,
+                            dest='set_new_password',
+                            help='Request a new Passwords')
 
         parser.add_argument('--default-dir',
                             action='store',
@@ -94,7 +104,7 @@ class MainApp:
                             dest='my_database',
                             help='MySQL Database Name.')
 
-        parser.add_argument('T', '--table-name',
+        parser.add_argument('-T', '--table-name',
                             action='store',
                             default='temperatureAndStatusPhaseTwo',
                             dest='table',
@@ -111,7 +121,7 @@ class MainApp:
 
         if args.thebox_dir[-1] != '/':
             args.thebox_dir += '/'
-        print args
+        # print args
         return args
 
     def define_environment(self):
@@ -130,7 +140,7 @@ class MainApp:
             if os.path.isfile(self.thebox_env_dir + self.access_file_name):
                 log.debug("Access file exists %s", self.thebox_env_dir + self.access_file_name)
                 i_file = open(self.thebox_env_dir + self.access_file_name, 'rb')
-                access_data = cPickle.load(i_file)
+                access_data = pickle.load(i_file)
                 # print(access_data)
             else:
                 log.debug("access File doesnt exist")
@@ -162,9 +172,25 @@ class MainApp:
                        'database': self.args.my_database}
         my_file_name = self.thebox_env_dir + self.access_file_name
         o_file = open(my_file_name, 'wb')
-        cPickle.dump(access_data, o_file, protocol=cPickle.HIGHEST_PROTOCOL)
+        pickle.dump(access_data, o_file, protocol=pickle.HIGHEST_PROTOCOL)
         o_file.close()
         return access_data
+
+    def connect_mysql(self):
+        # print self.access
+        try:
+            my_connection = connection.MySQLConnection(user=self.access['user'],
+                                                       password=base64.b64decode(self.access['password']),
+                                                       host=self.access['host'],
+                                                       database=self.access['database'])
+            return my_connection
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                log.info("MySQL: Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                log.info("MySQL: Database does not exist")
+            else:
+                log.debug(err)
 
 
 if __name__ == '__main__':
