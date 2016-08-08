@@ -252,6 +252,7 @@ class MainApp:
 
         Returns:
             my_connection (object): Is a MySQL connection object
+            
         """
 
         try:
@@ -273,6 +274,7 @@ class MainApp:
 
         Returns:
             my_query (str): MySQL query as a string
+
         """
         query_root = 'SELECT * FROM '
         if self.args.get_all:
@@ -315,7 +317,7 @@ class MainApp:
         """Writes to a file the retrieved data
 
         By now the only format supported is CSV but that can be easily changed.
-        
+
         """
         if self.args.output_format == ".csv":
             print self.data.keys()
