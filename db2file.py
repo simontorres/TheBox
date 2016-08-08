@@ -39,7 +39,6 @@ Note:
     This script complies with PEP8 and PEP257 (Google Style)
 
 """
-
 import os
 import sys
 import argparse
@@ -99,7 +98,6 @@ class MainApp:
             args (class): Contains all the arguments parsed or default values
 
         """
-
         parser = argparse.ArgumentParser(description='Tool to dump TheBox MySQL Database to ASCII File.')
 
         parser.add_argument('--mysql-access-file',
@@ -252,9 +250,8 @@ class MainApp:
 
         Returns:
             my_connection (object): Is a MySQL connection object
-            
-        """
 
+        """
         try:
             my_connection = connection.MySQLConnection(user=self.access['user'],
                                                        password=base64.b64decode(self.access['password']),
