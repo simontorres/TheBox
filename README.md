@@ -46,5 +46,10 @@ Example:
 
 Note:
     This script complies with [PEP8](https://www.python.org/dev/peps/pep-0008/) and [PEP257](https://www.python.org/dev/peps/pep-0257/) ([Google Style Docstrings](http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html))
- 
+
+## How to get this repository?
+Of course you can fork it from github or the easiest way to clone it. From a terminal type:
+
+    $ git clone https://github.com/simontorres/TheBox.git
+
 Software Specific for TheBox Experiment
