@@ -95,8 +95,6 @@ class MainApp:
     def get_args():
         """Handles the argparse library and returns the arguments
 
-
-
         Returns:
             args (class): Contains all the arguments parsed or default values
 
@@ -191,7 +189,7 @@ class MainApp:
     def define_environment(self):
         """Performs System checks and performs necessary actions
 
-
+        An environment in this context refeers to the basic MySQL access data an how and where it is stored.
 
         Returns:
             access_data (dict): Dictionary that contains access information to be used to access MySQL database. The
@@ -225,6 +223,13 @@ class MainApp:
     def access_info_request(self):
         """Request the password, formats access information and stores it in a file
 
+        The ideal location for the access information (and current default) is in a hidden folder in the
+         user's home directory. An example is the following:
+
+            /home/username/.thebox/mysqlaccess
+
+        That File stores the MySQL's user, password, host, and database. The password is encrypted.
+
         Returns:
             access_data (dict): Dictionary that contains access information to be used to access MySQL database from
             user input
@@ -243,7 +248,12 @@ class MainApp:
         return access_data
 
     def connect_mysql(self):
-        # print self.access
+        """Create MySQL connection object
+
+        Returns:
+            my_connection (object): Is a MySQL connection object
+        """
+
         try:
             my_connection = connection.MySQLConnection(user=self.access['user'],
                                                        password=base64.b64decode(self.access['password']),
@@ -259,6 +269,11 @@ class MainApp:
                 log.debug(err)
 
     def get_constraints(self):
+        """Defines the Query to be sent to the MySQL Server
+
+        Returns:
+            my_query (str): MySQL query as a string
+        """
         query_root = 'SELECT * FROM '
         if self.args.get_all:
             log.info('Getting all the data from table %s', self.args.table)
@@ -268,10 +283,20 @@ class MainApp:
         else:
             log.info('Getting part of the data')
             log.info("I'm sorry. This part in not implemented yet.")
-            return 0
+            my_query = '0'
+            return my_query
 
     def mysql_query(self, query):
-        if query != 0:
+        """Parses a Query to MySQL
+
+        Args:
+            query (str): A MySQL query in string format
+
+        Returns:
+            data_frame (object): A pandas' DataFrame object
+
+        """
+        if query != '0':
             try:
                 self.cursor.execute(query)
                 if self.args.header:
@@ -287,6 +312,11 @@ class MainApp:
                 log.debug("MySQL: raised OperationalError")
 
     def write_to_file(self):
+        """Writes to a file the retrieved data
+
+        By now the only format supported is CSV but that can be easily changed.
+        
+        """
         if self.args.output_format == ".csv":
             print self.data.keys()
             self.data.to_csv(self.args.output_name + self.args.output_format, )
