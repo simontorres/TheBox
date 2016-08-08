@@ -58,9 +58,9 @@ log.basicConfig(level=log.INFO)
 
 __author__ = 'Simon Torres'
 __date__ = '2016-08-04'
-__version__ = "0.1"
+__version__ = "1.0"
 __email__ = "storres@ctio.noao.edu"
-__status__ = "Development"
+__status__ = "Production"
 
 
 class MainApp:
